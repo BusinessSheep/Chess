@@ -21,6 +21,8 @@ public class Piece {
     public static final int BLACK = 1;
 
     public static final int PAWN = 0;
+    public static final int ROOK = 1;
+    public static final int BISHOP = 2;
 
 
     public Piece(int x, int y, int pieceType, int pieceColour) {
@@ -45,9 +47,17 @@ public class Piece {
             case PAWN:
             g.drawString("PAWN", hitbox.x + TILE_SIZE/4, hitbox.y + TILE_SIZE/2);
             break;
+            case ROOK:
+            g.drawString("ROOK", hitbox.x + TILE_SIZE/4, hitbox.y + TILE_SIZE/2);
+            break;
+            case BISHOP:
+            g.drawString("BISHOP", hitbox.x + TILE_SIZE/4, hitbox.y + TILE_SIZE/2);
+            break;
         }
         
     }
+
+    
 
     public void setSelected(boolean selected) {
         this.selected = selected;

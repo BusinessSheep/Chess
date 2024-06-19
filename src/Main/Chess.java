@@ -29,10 +29,22 @@ public class Chess implements Runnable{
     
 public void initialize() {
     pieces = new ArrayList<Piece>();
-    for(int i = 0; i < 8; i++) {
+    for(int i = 0; i < 8; i++) { // Pawns
         pieces.add (new Piece(i*TILE_SIZE, TILE_SIZE, Piece.PAWN, Piece.BLACK));
         pieces.add(new Piece(i * TILE_SIZE, (WIDTH_IN_TILES-2)*TILE_SIZE, Piece.PAWN, Piece.WHITE));
     }
+    pieces.add(new Piece(2*TILE_SIZE, 0, Piece.PAWN, Piece.BLACK));
+
+    for(int i = 0; i < 2; i++) { // Rooks
+        pieces.add(new Piece(i*(WIDTH_IN_TILES-1)*TILE_SIZE, 0, Piece.ROOK, Piece.BLACK));
+        pieces.add(new Piece(i*(WIDTH_IN_TILES-1)*TILE_SIZE, (WIDTH_IN_TILES-1)*TILE_SIZE, Piece.ROOK, Piece.WHITE));
+    }
+
+    // Bishops (please find a better way to do this istg)
+   pieces.add(new Piece(2 * TILE_SIZE, 0, Piece.BISHOP, Piece.BLACK));
+   pieces.add(new Piece(5 * TILE_SIZE, 0, Piece.BISHOP, Piece.BLACK));
+   pieces.add(new Piece(2 * TILE_SIZE, (WIDTH_IN_TILES-1)*TILE_SIZE, Piece.BISHOP, Piece.WHITE));
+   pieces.add(new Piece(5 * TILE_SIZE, (WIDTH_IN_TILES-1)*TILE_SIZE, Piece.BISHOP, Piece.WHITE));
 
 }
 
