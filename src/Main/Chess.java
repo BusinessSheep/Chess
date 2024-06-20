@@ -16,6 +16,8 @@ public class Chess implements Runnable {
     private Piece[][] pieces;
     private int turn = 0;
     private boolean check = false;
+    private Piece blackKing = null;
+    private Piece whiteKing = null;
 
     public Chess() {
         panel = new gamePanel(this);
@@ -62,7 +64,8 @@ public class Chess implements Runnable {
         pieces[7][4] = new Piece(4, 7, Piece.KING, Piece.WHITE);
 
         setValidMoves(pieces);
-
+        setValidKingMoves(pieces, blackKing.getValidMoves(), blackKing);
+        setValidKingMoves(pieces, whiteKing.getValidMoves(), whiteKing);
     }
 
     public void startGame() {
@@ -209,42 +212,103 @@ public void setValidMoves(Piece[][] pieces) {
                 case Piece.QUEEN:
                 break;
                 case Piece.KING: // make it so you can't move the king into harms way
-                int[][] dirMatrix = {
-                    {0, -1},  // up
-                    {0, 1},   // down
-                    {-1, 0},  // left
-                    {1, 0},    // right
-                    {-1, -1},  // up left
-                    {1, 1},   // down right
-                    {1, -1},  // up right
-                    {-1, 1}    // down left
-                };
-                for (int[] dir : dirMatrix) {
-                    int dx = dir[0];
-                    int dy = dir[1];
-                    int dist = 1;
+                if(p.getPieceColour() == Piece.BLACK) {
+                    blackKing = p;
+                } else {
+                    whiteKing = p;
+                }
                 
-                    int newX = p.x + dx * dist; // X coord to be checked
-                    int newY = p.y + dy * dist; // Y coord to be checked
-
-                    if (newX < 0 || newX >= pieces[0].length || newY < 0 || newY >= pieces.length) { // Checking boundaries
-                        continue;
-                    }
-
-                    if (pieces[newY][newX] == null) { // Is this a possible move?
-                        validMoves[newY][newX] = true;
-                        
-                    } else {
-                        if (pieces[newY][newX].getPieceColour() != p.getPieceColour()) { // Is this a capture?
-                            validMoves[newY][newX] = true;
-                        }
-                    }
-            } 
             break;
         }
+        validMoves[p.y][p.x] = false;
+        if(p.getPieceType() != Piece.KING)
         p.setValidMoves(validMoves);
     }
 }
+}
+
+public void setValidKingMoves(Piece[][] pieces, boolean[][] validMoves, Piece king) {
+    int[][] dirMatrix = {
+        {0, -1},  // up
+        {0, 1},   // down
+        {-1, 0},  // left
+        {1, 0},    // right
+        {-1, -1},  // up left
+        {1, 1},   // down right
+        {1, -1},  // up right
+        {-1, 1}    // down left
+    };
+    for (int[] dir : dirMatrix) {
+        int dx = dir[0];
+        int dy = dir[1];
+        int dist = 1;
+    
+        int newX = king.x + dx * dist; // X coord to be checked
+        int newY = king.y + dy * dist; // Y coord to be checked
+
+        if (newX < 0 || newX >= pieces[0].length || newY < 0 || newY >= pieces.length) { // Checking boundaries
+            continue;
+        }
+
+        Piece originalPiece = pieces[newY][newX];
+
+        if (pieces[newY][newX] == null) { // Is this a possible move?
+             // Temporarily move the king
+         
+         pieces[king.y][king.x] = null;
+         pieces[newY][newX] = king;
+
+         setValidMoves(pieces);
+            
+            validMoves[newY][newX] = true;
+            for(int i = 0; i < pieces.length; i++) {
+                for(int j = 0; j < pieces[i].length; j++) {
+                    Piece p = pieces[i][j];
+                    if(p != null) {
+                        if(p.getPieceColour() != king.getPieceColour() && p.getValidMoves()[newY][newX] == true) {
+                            validMoves[newY][newX] = false;
+                        }
+                    }
+                }
+            }
+            
+        } else {
+            // king is killing itself when checked for some reason lol
+            if (pieces[newY][newX].getPieceColour() != king.getPieceColour()) { // Is this a capture?
+                pieces[king.y][king.x] = null;
+                pieces[newY][newX] = king;
+
+                setValidMoves(pieces);
+                validMoves[newY][newX] = true;
+                for(int i = 0; i < pieces.length; i++) {
+                    for(int j = 0; j < pieces[i].length; j++) {
+                        Piece p = pieces[i][j];
+                        if(p != null) {
+                            if(p.getPieceColour() != king.getPieceColour() && p.getValidMoves()[newY][newX] == true) {
+                                validMoves[newY][newX] = false;
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+        // Restore the original board state
+        pieces[newY][newX] = originalPiece;
+        pieces[king.y][king.x] = king;
+        setValidMoves(pieces);
+        
+    } 
+    
+    king.setValidMoves(validMoves);
+}
+
+public Piece getBlackKing() {
+    return blackKing;
+}
+
+public Piece getWhiteKing() {
+    return whiteKing;
 }
 
 public boolean checkForCheck(Piece[][] pieces) {

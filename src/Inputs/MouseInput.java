@@ -65,6 +65,8 @@ public class MouseInput implements MouseInputListener {
                 panel.getChess().setPositions();
                 panel.getChess().setTurn((panel.getChess().getTurn() + 1) % 2); // set next turn
                 panel.getChess().setValidMoves(pieces);
+                panel.getChess().setValidKingMoves(pieces, panel.getChess().getBlackKing().getValidMoves(), panel.getChess().getBlackKing());
+                panel.getChess().setValidKingMoves(pieces, panel.getChess().getWhiteKing().getValidMoves(), panel.getChess().getWhiteKing());
                 panel.getChess().setCheck(panel.getChess().checkForCheck(pieces));
             }
         }
